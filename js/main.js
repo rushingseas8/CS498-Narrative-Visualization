@@ -1,5 +1,8 @@
 // Test
 console.log("Requesting data.");
-d3.csv("https://gitlab.engr.illinois.edu/galeks2/cs-498-narrative-visualization/raw/master/data/AllData.csv", function(data) {
-    console.log("Data length: " + data.length);
-});
+d3.tsv("https://raw.githubusercontent.com/rushingseas8/CS498-Narrative-Visualization/master/data/AllData.csv")
+    .then(function(data) {
+        console.log("Data length: " + data.length);
+        console.log(data[0]);
+    })
+;
