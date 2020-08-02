@@ -377,6 +377,12 @@ d3.tsv("https://raw.githubusercontent.com/rushingseas8/CS498-Narrative-Visualiza
         // Store all the data in memory
         data = _data;
 
+        // for (var i = 0; i < data.length; i++) {
+        //     data.ID = i;
+        // }
+
+
+
         // Start by filtering the data
         filtered =
             usefulColumns(
@@ -384,6 +390,12 @@ d3.tsv("https://raw.githubusercontent.com/rushingseas8/CS498-Narrative-Visualiza
             );
         console.log("Filtered for " + state + " to get " + filtered.length + " rows.");
 
+        recomputeBounds();
+        redraw();
+
+        // Get the computed width of the SVG element and redraw again
+        SVGWidth = document.getElementById("chart1").offsetWidth - (2 * Margin);
+        SVGHeight = document.getElementById("chart1").offsetHeight - (2 * Margin);
         recomputeBounds();
         redraw();
     })
