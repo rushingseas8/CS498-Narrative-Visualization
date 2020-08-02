@@ -396,7 +396,7 @@ d3.tsv("https://raw.githubusercontent.com/rushingseas8/CS498-Narrative-Visualiza
         // Get the computed width of the SVG element and redraw again
         SVGWidth = document.getElementById("chart1").offsetWidth - (2 * Margin);
         SVGHeight = document.getElementById("chart1").offsetHeight - (2 * Margin);
-        recomputeBounds();
+        //recomputeBounds();
         redraw();
     })
 ;
