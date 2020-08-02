@@ -1,12 +1,25 @@
 var SVGWidth = 640;
 var SVGHeight = 480;
-var Margin = 50;
+var Margin = 60;
 
+var data = null;
 var filtered = null;
 
 var x = null;
 var y = null;
 var height = null;
+
+var state = "Illinois";
+
+window.addEventListener("resize", function() {
+    // Recompute window boundaries
+    // SVGWidth = Math.max(640, document.getElementById("chart1").offsetWidth - (2 * Margin));
+    // SVGHeight = Math.max(480, document.getElementById("chart1").offsetHeight - (2 * Margin));
+    SVGWidth = document.getElementById("chart1").offsetWidth - (2 * Margin);
+    SVGHeight = document.getElementById("chart1").offsetHeight - (2 * Margin);
+
+    redraw();
+});
 
 /*
  * Filters the data by state.
@@ -55,10 +68,10 @@ function usefulColumns(data) {
     return toReturn;
 }
 
-function drawLineChart(svg, data, color, attribute) {
+function drawLineChart(svg, _data, color, attribute) {
     // X normalizes the x axis
     var x = d3.scaleLinear()
-        .domain([0, data.length])
+        .domain([0, _data.length])
         .range([0, SVGWidth]);
 
     // var height = d3.scaleLinear()
@@ -68,7 +81,7 @@ function drawLineChart(svg, data, color, attribute) {
     // var tooltip = d3.select("#Tooltip");
 
     svg.append("path")
-        .datum(data)
+        .datum(_data)
         .attr("id", "line" + attribute)
         .attr("fill", "none")
         .attr("stroke", color)
@@ -137,8 +150,25 @@ function toggleDeaths() {
     recomputeBounds();
 }
 
+// Called when State dropdown changes
+function stateChange(value) {
+    // console.log("Selected: " + value);
+    this.state = value;
+
+    // Re-filter the data for the new state
+    filtered =
+        usefulColumns(
+            filterByState(data, state)
+        );
+    // console.log("Filtered for " + state + " to get " + filtered.length + " rows.");
+    console.log(filtered);
+
+    recomputeBounds();
+    redraw();
+}
+
 function recomputeBounds() {
-    console.log("Recomputing");
+    // console.log("Recomputing");
     if (filtered == undefined || filtered == null) {
         console.log("Warning: data was null. Returning!");
         return;
@@ -204,8 +234,11 @@ function redraw() {
 
     var tooltip = d3.select("#Tooltip");
 
-    svg.append("path") // this is the black vertical line to follow mouse
+    // this is the black vertical line to follow mouse
+    // Note that we have to translate by (-Margin) left!
+    svg.append("path")
          .attr("id", "mouse-line")
+         // .attr("transform", "translate(" + (-Margin) + "," + 0 + ")")
          .style("stroke", "black")
          .style("stroke-width", "1px")
          .style("opacity", "0")
@@ -217,6 +250,7 @@ function redraw() {
         .attr("height", SVGHeight + (2 * Margin))
         .attr("fill", "none")
         .attr("pointer-events", "all")
+        // .attr("transform", "translate(" + (-Margin) + "," + (-Margin) + ")")
         // Enable on mouse over
         .on("mouseover", function() {
             d3.select("#mouse-line").style("opacity", 1);
@@ -297,11 +331,29 @@ function redraw() {
     drawLineChart(svg, filtered, "red", "Deaths");
     // drawLineChart(svg, filtered, "steelblue", "Testing_Rate");
 
+    // Title
+    d3.select("svg")
+        .append("text")
+        .attr("transform", "translate(" + (SVGWidth / 2 + 35) + "," + (Margin + 35) + ")")
+        .attr("font-size", "2rem")
+        .attr("font-weight", "bold")
+        .attr("text-anchor", "middle")
+        .text("Cases/Time for " + state);
+
     // Left axis
     d3.select("svg")
         .append("g")
         .attr("transform", "translate(" + Margin + ", " + Margin + ")")
         .call(d3.axisLeft(y));
+
+    // Text label for the y axis
+    svg.append("text")
+        .attr("transform", "rotate(-90)")
+        .attr("y", 0 - Margin)
+        .attr("x", 0 - (SVGHeight / 2))
+        .attr("dy", "1em")
+        .style("text-anchor", "middle")
+        .text("Count");
 
     var xAxis = d3.scaleTime().domain([new Date(2020, 03, 12), new Date(2020, 06, 30)]).range([0, SVGWidth]);
 
@@ -310,78 +362,29 @@ function redraw() {
         .append("g")
         .attr("transform", "translate(" + Margin + ", " + (SVGHeight + Margin) + ")")
         .call(d3.axisBottom(xAxis));
+
+    // Text label for the x axis
+    d3.select("svg")
+        .append("text")
+        .attr("transform", "translate(" + (SVGWidth / 2 + 35) + " ," + (SVGHeight + Margin + 35) + ")")
+        .style("text-anchor", "middle")
+        .text("Date");
 }
 
 d3.tsv("https://raw.githubusercontent.com/rushingseas8/CS498-Narrative-Visualization/gh-pages/data/AllData.csv")
-    .then(function(data) {
-        console.log("Data length: " + data.length);
+    .then(function(_data) {
+        console.log("Loaded " + _data.length + " rows.");
+        // Store all the data in memory
+        data = _data;
 
-        console.log(data[0]);
-        // console.log(data[0].Date);
-
-        // console.log(JSON.stringify(data[0]));
-        // console.log("Filtering by Illinois: " + JSON.stringify(usefulColumns(filter(data, "Illinois"))));
-
+        // Start by filtering the data
         filtered =
             usefulColumns(
-                filterByState(data, "Illinois")
+                filterByState(data, state)
             );
-
-        console.log("Filtered: " + filtered);
-
-        var x = d3.scaleLinear()
-            .domain([0, filtered.length])
-            .range([0, 500]);
-
-        // height = d3.scaleLinear()
-        //     .domain([0, d3.max(filtered, function(d) { return +d.Active; })])
-        //     .range([0, 500]);
-        //
-        // y = d3.scaleLinear()
-        //     .domain([0, d3.max(filtered, function(d) { return +d.Active; })])
-        //     .range([SVGHeight, 0]);
+        console.log("Filtered for " + state + " to get " + filtered.length + " rows.");
 
         recomputeBounds();
-
-        // Basic bar chart for testing
-        // svg.selectAll("rect")
-        //     .data(filtered)
-        //     .enter()
-        //     .append("rect")
-        //     .attr("x", function(d,i) { return x(i); })
-        //     .attr("y", function(d,i) { return 500 - height(d.Active); })
-        //     .attr("width", 2)
-        //     .attr("height", function(d,i) {return height(d.Active);})
-        //     ;
-
-        // svg.append("path")
-        //     .datum(filtered)
-        //     .attr("fill", "none")
-        //     .attr("stroke", "steelblue")
-        //     .attr("stroke-width", 1.5)
-        //     .attr("d", d3.line()
-        //         .x(function(d,i) { return x(i); })
-        //         .y(function(d,i) { return 500 - height(d.Active); })
-        //     )
-        //     ;
-
         redraw();
-
-        // svg.append("path")
-        //     .datum(filtered)
-        //     .attr("fill", "none")
-        //     .attr("stroke", "steelblue")
-        //     .attr("stroke-width", 1.5)
-        //     .attr("d", d3.line()
-        //         .x(function(d,i) { return x(i); })
-        //         .y(function(d,i) { return 500 - height(d.Confirmed); })
-        //     )
-        //     ;
-
-        console.log("Filtering by date: " + JSON.stringify(
-            usefulColumns(
-                filterByDate(filterByState(data, "Illinois"), "4/21/2020")
-            )
-        ));
     })
 ;
