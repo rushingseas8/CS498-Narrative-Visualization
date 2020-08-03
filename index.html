@@ -20,7 +20,7 @@
     </head>
     <body>
         <!-- Tooltip on mouseover -->
-        <div class="tooltip" id="Tooltip" style="pointer-events: none; border: outset; border-color: black; border-width: 2px; padding: 2px;">
+        <div class="tooltip" id="Tooltip" style="z-index:2; pointer-events: none; border: outset; border-color: black; border-width: 2px; padding: 2px;">
         </div>
 
         <div class="container">
@@ -46,10 +46,10 @@
                                 What went right?
                             </h2>
                             <p>
-                                The world has no shortage of examples of nations that handled the pandemic in a manner than minimized harm to its citizens: South Korea being the shining example of employing contact tracing and widespread mask adoption. Some states in the US were quite aggressive in their shutdown protocols, and exemplify the notion of flattening the curve. Our first example is Vermont, which despite neighboring New York state, had a strong compliance rate with both stay at home orders and mask adoption. The graph below shows how the number of confirmed cases is growing slowly, with only around 700 new confirmed cases between April 12 and July 30. The death count of Vermont as of August 1st is 57, which is miniscule when compared to New York state's over 32,000 deaths to date.
+                                The world has no shortage of examples of nations that handled the pandemic in a manner than minimized harm to its citizens: South Korea being the shining example of employing contact tracing and widespread mask adoption. Some states in the US were quite aggressive in their shutdown protocols, and exemplify the notion of flattening the curve. Our first example is Vermont, which despite neighboring New York state, had a strong compliance rate with both stay at home orders and mask adoption. The graph below shows how the number of confirmed cases is growing slowly, with only around 700 new confirmed cases between April 12 and July 30. The death count of Vermont as of August 1st is 57, which is miniscule when compared to New York state's over 32,000 deaths to date. This response allowed Vermont to reopen with comparatively minimal impact to overall case numbers.
                             </p>
                             <p>
-                                You can see the timeline for Vermont below. Mouse over to view additional details.
+                                The timeline for Vermont is displayed below. You can <b>mouse over</b> the chart to view additional details for a particular day.
                             </p>
                         </div>
                         <div id="info2" style="opacity: 0; max-height: 0px;">
@@ -60,19 +60,30 @@
                                 The response to the virus was politicized, which reduced the effictiveness of any possible response. The governors of each state had to race to develop their own responses, since by April, it became clear that federal aid was not coming.
                             </p>
                             <p>
-                                Some states responded poorly compared to others. One example is the case of Florida, which ended its stay at home order on April 30, 2020. As of May 4th, many businesses reopened to some degree. The result in the number of cases is clear, especially skyrocketing as holidays such as Memorial day (May 25th) and the 4th of July resulted in massive gatherings of people. The overall rate of using masks was, and still is, one of the lowest, leading to exponential growth that is continuing as of August 1st, 2020.
+                                Some states responded poorly compared to others. One example is the case of Florida, which ended its stay at home order on April 30, 2020. As of May 4th, many businesses reopened to some degree, with full reopening finished by June 1st. The result in the number of cases is clear, especially skyrocketing on such holidays as Memorial day (May 25th) and the 4th of July, which resulted in massive gatherings of people. The overall rate of using masks was, and still is, one of the lowest, leading to exponential growth that is continuing as of August 1st, 2020. As a late response to the growing number of cases, Gov. Ron DeSantis ordered bars to begin closing on June 26th, which did little to stop the upcoming spread.
                             </p>
                         </div>
                         <div id="info3" style="opacity: 0; max-height: 0px;">
                             <h2>
-                                Hi bb if you made it here I'm sending you lubs <3 (AND KITTENS)
+                                How well did other states do?
                             </h2>
-                            <img src="https://www.aspca.org/sites/default/files/blog_foster-myth_062718_main.jpg">
+                            <p>
+                                Other states fell somewhere in between these two extremes. Some states that might be interesting to explore are ones that are isolated, with extremely small populations (Alaska, Hawaii). Another interesting category would be seeing how political affinity affected large population states (e.g., California vs. Texas).
+                            </p>
+                            <p>
+                                You can interact with the graph below to pick any other state (and outlying territories) with the buttons and dropdowns on the left. You can also choose to hide or show any graphs. The chart is set to Illinois, which had a strong response from the governor (but a large population, which made the spread of the virus hard to contain).
+                            </p>
+                            <p>
+                                These have been trying times for all of us. Here's a kitten to lighten up the mood a bit:
+                            </p>
+                            <img src="https://www.aspca.org/sites/default/files/blog_foster-myth_062718_main.jpg" width=100%>
                         </div>
                     </div>
 
+                    <hr>
+
                     <div class="row">
-                        <div class="col-2" id="checkboxes" style="display:none;">
+                        <div class="col-2 align-self-center" id="checkboxes" style="display:none;">
                             <div class="btn-group-vertical" role="group">
                                 <label class="btn btn-secondary active" id="activeButton">
                                     <input type="checkbox" checked onclick="toggleActive()">Toggle active
@@ -83,67 +94,73 @@
                                 <label class="btn btn-secondary active" id="deathsButton">
                                     <input type="checkbox" checked onclick="toggleDeaths()">Toggle deaths
                                 </label>
-                                <hr>
-                                <div class="form-group">
-                                	<label for="state" class="control-label" style="display:block; text-align:center;">State</label>
-                                	<div class="col-sm-12">
-                                		<select class="form-control" id="state" name="state" onchange="stateChange(this.value)">
-                                			<option value="Alaska">Alaska</option>
-                                			<option value="Alabama">Alabama</option>
-                                			<option value="Arkansas">Arkansas</option>
-                                			<option value="Arizona">Arizona</option>
-                                			<option value="California">California</option>
-                                			<option value="Colorado">Colorado</option>
-                                			<option value="Connecticut">Connecticut</option>
-                                			<option value="District of Columbia">Washington D.C.</option>
-                                			<option value="Delaware">Delaware</option>
-                                			<option value="Florida">Florida</option>
-                                			<option value="Georgia">Georgia</option>
-                                			<option value="Hawaii">Hawaii</option>
-                                			<option value="Iowa">Iowa</option>
-                                			<option value="Idaho">Idaho</option>
-                                			<option value="Illinois">Illinois</option>
-                                			<option value="Indiana">Indiana</option>
-                                			<option value="Kansas">Kansas</option>
-                                			<option value="Kentucky">Kentucky</option>
-                                			<option value="Louisiana">Louisiana</option>
-                                			<option value="Massachusetts">Massachusetts</option>
-                                			<option value="Maryland">Maryland</option>
-                                			<option value="Maine">Maine</option>
-                                			<option value="Michigan">Michigan</option>
-                                			<option value="Minnesota">Minnesota</option>
-                                			<option value="Missouri">Missouri</option>
-                                			<option value="Mississippi">Mississippi</option>
-                                			<option value="Montana">Montana</option>
-                                			<option value="North Carolina">North Carolina</option>
-                                			<option value="North Dakota">North Dakota</option>
-                                			<option value="Nebraska">Nebraska</option>
-                                			<option value="New Hampshire">New Hampshire</option>
-                                			<option value="New Jersey">New Jersey</option>
-                                			<option value="New Mexico">New Mexico</option>
-                                			<option value="Nevada">Nevada</option>
-                                			<option value="New York">New York</option>
-                                			<option value="Ohio">Ohio</option>
-                                			<option value="Oklahoma">Oklahoma</option>
-                                			<option value="Oregon">Oregon</option>
-                                			<option value="Pennsylvania">Pennsylvania</option>
-                                			<option value="Puerto Rico">Puerto Rico</option>
-                                			<option value="Rhode Island">Rhode Island</option>
-                                			<option value="South Carolina">South Carolina</option>
-                                			<option value="South Dakota">South Dakota</option>
-                                			<option value="Tennessee">Tennessee</option>
-                                			<option value="Texas">Texas</option>
-                                			<option value="Utah">Utah</option>
-                                			<option value="Virginia">Virginia</option>
-                                			<option value="Vermont">Vermont</option>
-                                			<option value="Washington">Washington</option>
-                                			<option value="Wisconsin">Wisconsin</option>
-                                			<option value="West Virginia">West Virginia</option>
-                                			<option value="Wyoming">Wyoming</option>
-                                		</select>
-                                	</div>
-                                </div>
                             </div>
+                            <hr>
+                            <div class="form-group">
+                            	<label for="state" class="control-label" style="display:block; text-align:center;">State</label>
+                            	<div class="col-sm-12 px-0">
+                            		<select class="form-control" id="state" name="state" onchange="stateChange(this.value)">
+                            			<option value="Alaska">Alaska</option>
+                            			<option value="Alabama">Alabama</option>
+                            			<option value="Arkansas">Arkansas</option>
+                            			<option value="Arizona">Arizona</option>
+                            			<option value="California">California</option>
+                            			<option value="Colorado">Colorado</option>
+                            			<option value="Connecticut">Connecticut</option>
+                            			<option value="District of Columbia">Washington D.C.</option>
+                            			<option value="Delaware">Delaware</option>
+                            			<option value="Florida">Florida</option>
+                            			<option value="Georgia">Georgia</option>
+                            			<option value="Hawaii">Hawaii</option>
+                            			<option value="Iowa">Iowa</option>
+                            			<option value="Idaho">Idaho</option>
+                            			<option value="Illinois" selected>Illinois</option>
+                            			<option value="Indiana">Indiana</option>
+                            			<option value="Kansas">Kansas</option>
+                            			<option value="Kentucky">Kentucky</option>
+                            			<option value="Louisiana">Louisiana</option>
+                            			<option value="Massachusetts">Massachusetts</option>
+                            			<option value="Maryland">Maryland</option>
+                            			<option value="Maine">Maine</option>
+                            			<option value="Michigan">Michigan</option>
+                            			<option value="Minnesota">Minnesota</option>
+                            			<option value="Missouri">Missouri</option>
+                            			<option value="Mississippi">Mississippi</option>
+                            			<option value="Montana">Montana</option>
+                            			<option value="North Carolina">North Carolina</option>
+                            			<option value="North Dakota">North Dakota</option>
+                            			<option value="Nebraska">Nebraska</option>
+                            			<option value="New Hampshire">New Hampshire</option>
+                            			<option value="New Jersey">New Jersey</option>
+                            			<option value="New Mexico">New Mexico</option>
+                            			<option value="Nevada">Nevada</option>
+                            			<option value="New York">New York</option>
+                            			<option value="Ohio">Ohio</option>
+                            			<option value="Oklahoma">Oklahoma</option>
+                            			<option value="Oregon">Oregon</option>
+                            			<option value="Pennsylvania">Pennsylvania</option>
+                            			<option value="Puerto Rico">Puerto Rico</option>
+                            			<option value="Rhode Island">Rhode Island</option>
+                            			<option value="South Carolina">South Carolina</option>
+                            			<option value="South Dakota">South Dakota</option>
+                            			<option value="Tennessee">Tennessee</option>
+                            			<option value="Texas">Texas</option>
+                            			<option value="Utah">Utah</option>
+                            			<option value="Virginia">Virginia</option>
+                            			<option value="Vermont">Vermont</option>
+                            			<option value="Washington">Washington</option>
+                            			<option value="Wisconsin">Wisconsin</option>
+                            			<option value="West Virginia">West Virginia</option>
+                            			<option value="Wyoming">Wyoming</option>
+                            			<option value="Puerto Rico">Puerto Rico</option>
+                            			<option value="Guam">Guam</option>
+                            			<option value="American Samoa">American Samoa</option>
+                            			<option value="Northern Mariana Islands">N. Mariana Islands</option>
+                            			<option value="Virgin Islands">Virgin Islands</option>
+                            		</select>
+                            	</div>
+                            </div>
+
                         </div>
                         <div class="col" id="chart1"></div>
                     </div> <!-- End row -->
@@ -167,10 +184,7 @@
                 <p class="overlayTitle">A study into COVID-19 by George Aleksandrovich</p>
                 </br>
                 <p>
-                    Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-                </p>
-                <p>
-                    Aight so basically here's what you need to know. We're going to look at a few different examples of states that handled their response to COVID-19 in different ways to compare and contrast what really works. At the end you're going to be able to explore other states to see what they did right and wrong and make some conclusions for yourself. Got it? Let's go!
+                    Many states varied widely in their responses to COVID-19. In this Narrative Visualization, we will look at a few different extreme examples of states' responses, describe the situation that occurred behind the scenes of the data, and compare and contrast the different results they produced. At the end you're going to be able to explore other states to see what they did right and wrong and make some conclusions for yourself. Got it? Let's go!
                 </p>
                 </br>
                 <div class="col-med-12" style="display: flex; align-items: center; justify-content:center;">

@@ -13,6 +13,10 @@ var state = "Vermont";
 
 var infoPage = 1;
 
+var activeActive = false;
+var confirmedActive = false;
+var deathsActive = true;
+
 function nextPage() {
     if (infoPage < 1 || infoPage > 3) {
         console.log("Refusing to advance page past end.");
@@ -80,11 +84,27 @@ function prevPage() {
 function updatePage() {
     if (infoPage == 1) {
         stateChange("Vermont");
+        d3.select("#checkboxes").style("display", "none");
+        activeActive = false;
+        confirmedActive = false;
     } else if (infoPage == 2) {
         stateChange("Florida");
+        d3.select("#checkboxes").style("display", "none");
+        activeActive = false;
+        confirmedActive = false;
     } else if (infoPage == 3) {
         stateChange("Illinois");
+        d3.select("#checkboxes").style("display", "");
+        activeActive = true;
+        confirmedActive = true;
     }
+
+    SVGWidth = document.getElementById("chart1").offsetWidth - (2 * Margin);
+    SVGHeight = document.getElementById("chart1").offsetHeight - (2 * Margin);
+
+    recomputeBounds();
+    redraw();
+    hideUnused();
 }
 
 // Resize listener to handle redrawing the graph when the window size changes
@@ -96,6 +116,7 @@ window.addEventListener("resize", function() {
     SVGHeight = document.getElementById("chart1").offsetHeight - (2 * Margin);
 
     redraw();
+    hideUnused();
 });
 
 /*
@@ -215,10 +236,6 @@ function drawLineChart(svg, _data, color, attribute) {
     ;
 }
 
-var activeActive = true;
-var confirmedActive = true;
-var deathsActive = true;
-
 function toggleActive() {
     activeActive = !activeActive;
     recomputeBounds();
@@ -234,7 +251,7 @@ function toggleDeaths() {
     recomputeBounds();
 }
 
-// Called when State dropdown changes
+// Called when State dropdown changes (or when you want to update the state filter)
 function stateChange(value) {
     // console.log("Selected: " + value);
     this.state = value;
@@ -245,10 +262,31 @@ function stateChange(value) {
             filterByState(data, state)
         );
     // console.log("Filtered for " + state + " to get " + filtered.length + " rows.");
-    console.log(filtered);
+    // console.log(filtered);
 
     recomputeBounds();
     redraw();
+    hideUnused();
+}
+
+function hideUnused() {
+    if (activeActive) {
+        d3.select("#lineActive").style("opacity", 1);
+    } else {
+        d3.select("#lineActive").style("opacity", 0);
+    }
+
+    if (confirmedActive) {
+        d3.select("#lineConfirmed").style("opacity", 1);
+    } else {
+        d3.select("#lineConfirmed").style("opacity", 0);
+    }
+
+    if (deathsActive) {
+        d3.select("#lineDeaths").style("opacity", 1);
+    } else {
+        d3.select("#lineDeaths").style("opacity", 0);
+    }
 }
 
 function recomputeBounds() {
@@ -298,24 +336,7 @@ function recomputeBounds() {
 
 
     redraw(d3.select("#chart1"));
-
-    if (activeActive) {
-        d3.select("#lineActive").style("opacity", 1);
-    } else {
-        d3.select("#lineActive").style("opacity", 0);
-    }
-
-    if (confirmedActive) {
-        d3.select("#lineConfirmed").style("opacity", 1);
-    } else {
-        d3.select("#lineConfirmed").style("opacity", 0);
-    }
-
-    if (deathsActive) {
-        d3.select("#lineDeaths").style("opacity", 1);
-    } else {
-        d3.select("#lineDeaths").style("opacity", 0);
-    }
+    hideUnused();
 }
 
 function redraw() {
@@ -418,7 +439,7 @@ function redraw() {
                 </div>`;
 
             tooltip.html(tooltipString)
-                .style("background", "#0066AA11")
+                .style("background", "#c7d2ffEE")
                 .style("left", (d3.event.pageX) + "px")
                 .style("top", (d3.event.pageY) + "px")
             ;
@@ -434,11 +455,11 @@ function redraw() {
     // Title
     d3.select("svg")
         .append("text")
-        .attr("transform", "translate(" + (SVGWidth / 2 + 50) + "," + (Margin + 35) + ")")
+        .attr("transform", "translate(" + (SVGWidth / 2 + 50) + "," + (Margin) + ")")
         .attr("font-size", "2rem")
         .attr("font-weight", "bold")
         .attr("text-anchor", "middle")
-        .text("Cases/Time for " + state);
+        .text("COVID-19 progress for " + state);
 
     // Left axis
     d3.select("svg")
@@ -469,6 +490,120 @@ function redraw() {
         .attr("transform", "translate(" + (SVGWidth / 2 + 35) + " ," + (SVGHeight + Margin + 35) + ")")
         .style("text-anchor", "middle")
         .text("Date");
+
+    // Legend title (followed by other entries)
+    d3.select("svg")
+        .append("text")
+        .attr("x", SVGWidth - (Margin + 0) + 20)
+        .attr("y", Margin + 200 + 5)
+        // .attr("transform", "translate(" + "," + ")")
+        .style("text-anchor", "left")
+        .style("font-weight", "bold")
+        .text("Legend");
+
+    var yOffset = 75;
+    if (activeActive) {
+        d3.select("svg")
+            .append("circle")
+            .attr("cx", SVGWidth - (Margin + 0))
+            .attr("cy", Margin + 150 + yOffset)
+            .attr("r", 6)
+            .style("fill", "steelblue");
+
+        d3.select("svg")
+            .append("text")
+            .attr("x", SVGWidth - (Margin + 0) + 10)
+            .attr("y", Margin + 150 + yOffset + 5)
+            .style("text-anchor", "left")
+            .text("Active cases");
+        yOffset += 25;
+    }
+
+    if (confirmedActive) {
+        d3.select("svg")
+            .append("circle")
+            .attr("cx", SVGWidth - (Margin + 0))
+            .attr("cy", Margin + 150 + yOffset)
+            .attr("r", 6)
+            .style("fill", "darkgreen");
+
+        d3.select("svg")
+            .append("text")
+            .attr("x", SVGWidth - (Margin + 0) + 10)
+            .attr("y", Margin + 150 + yOffset + 5)
+            .style("text-anchor", "left")
+            .text("Confirmed cases");
+        yOffset += 25;
+    }
+
+    if (deathsActive) {
+        d3.select("svg")
+            .append("circle")
+            .attr("cx", SVGWidth - (Margin + 0))
+            .attr("cy", Margin + 150 + yOffset)
+            .attr("r", 6)
+            .style("fill", "red");
+
+        d3.select("svg")
+            .append("text")
+            .attr("x", SVGWidth - (Margin + 0) + 10)
+            .attr("y", Margin + 150 + yOffset + 5)
+            .style("text-anchor", "left")
+            .text("Deaths");
+        yOffset += 25;
+    }
+
+    if (infoPage == 1) {
+        d3.select("svg")
+            .append("rect")
+            .attr("x", 0.53 * SVGWidth)
+            .attr("y", 1.1 * Margin)
+            .attr("width", 1)
+            .attr("height", SVGHeight - (0.1 * Margin))
+            .attr("fill", "blue")
+            ;
+
+        d3.select("svg")
+            .append("text")
+            .text("Reopening began June 1")
+            .attr("x", (0.53 * SVGWidth) + 5)
+            .attr("y", 2 * Margin + 5)
+            ;
+    }
+
+    if (infoPage == 2) {
+        d3.select("svg")
+            .append("rect")
+            .attr("x", 0.53 * SVGWidth)
+            .attr("y", 2 * Margin)
+            .attr("width", 1)
+            .attr("height", SVGHeight - Margin)
+            .attr("fill", "blue")
+            ;
+
+        d3.select("svg")
+            .append("text")
+            .text("Fully reopened June 1")
+            .attr("x", (0.53 * SVGWidth) + 5)
+            .attr("y", 2 * Margin + 5)
+            ;
+
+        d3.select("svg")
+            .append("rect")
+            .attr("x", 0.77 * SVGWidth)
+            .attr("y", 2 * Margin)
+            .attr("width", 1)
+            .attr("height", SVGHeight - Margin)
+            .attr("fill", "blue")
+            ;
+
+        d3.select("svg")
+            .append("text")
+            .text("Closing again June 26")
+            .attr("x", (0.77 * SVGWidth) + 5)
+            .attr("y", 2 * Margin + 5)
+            ;
+    }
 }
 
 d3.tsv("https://raw.githubusercontent.com/rushingseas8/CS498-Narrative-Visualization/gh-pages/data/AllData.csv")
@@ -522,7 +657,7 @@ d3.tsv("https://raw.githubusercontent.com/rushingseas8/CS498-Narrative-Visualiza
             usefulColumns(
                 filterByState(data, state)
             );
-        console.log("Filtered for " + state + " to get " + filtered.length + " rows.");
+        // console.log("Filtered for " + state + " to get " + filtered.length + " rows.");
 
         recomputeBounds();
         redraw();
@@ -530,7 +665,8 @@ d3.tsv("https://raw.githubusercontent.com/rushingseas8/CS498-Narrative-Visualiza
         // Get the computed width of the SVG element and redraw again
         SVGWidth = document.getElementById("chart1").offsetWidth - (2 * Margin);
         SVGHeight = document.getElementById("chart1").offsetHeight - (2 * Margin);
-        //recomputeBounds();
+        // recomputeBounds();
         redraw();
+        hideUnused();
     })
 ;
