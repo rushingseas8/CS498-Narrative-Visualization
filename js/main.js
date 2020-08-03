@@ -9,8 +9,85 @@ var x = null;
 var y = null;
 var height = null;
 
-var state = "Illinois";
+var state = "Vermont";
 
+var infoPage = 1;
+
+function nextPage() {
+    if (infoPage < 1 || infoPage > 3) {
+        console.log("Refusing to advance page past end.");
+        return;
+    }
+
+    console.log("Next page");
+    d3.select("#info" + infoPage)
+        .transition()
+        .style("max-height", "0px")
+        .style("opacity", 0)
+        .duration(1000)
+        ;
+    if (infoPage >= 1 && infoPage <= 3) {
+        infoPage++;
+    }
+    d3.select("#info" + infoPage)
+        .transition()
+        .duration(1000)
+        .style("max-height", "1000px")
+        .style("opacity", 1)
+        ;
+
+    if (infoPage > 1) {
+        document.getElementById("prevButton").disabled = false;
+    }
+    if (infoPage == 3) {
+        document.getElementById("nextButton").disabled = true;
+    }
+    updatePage();
+}
+
+function prevPage() {
+    if (infoPage < 1 || infoPage > 3) {
+        console.log("Refusing to advance page before start.");
+        return;
+    }
+
+    console.log("Prev page");
+    d3.select("#info" + infoPage)
+        .transition()
+        .style("max-height", "0px")
+        .style("opacity", 0)
+        .duration(1000)
+        ;
+    if (infoPage >= 1 && infoPage <= 3) {
+        infoPage--;
+    }
+    d3.select("#info" + infoPage)
+        .transition()
+        .duration(1000)
+        .style("max-height", "1000px")
+        .style("opacity", 1)
+        ;
+
+    if (infoPage == 1) {
+        document.getElementById("prevButton").disabled = true;
+    }
+    if (infoPage < 3) {
+        document.getElementById("nextButton").disabled = false;
+    }
+    updatePage();
+}
+
+function updatePage() {
+    if (infoPage == 1) {
+        stateChange("Vermont");
+    } else if (infoPage == 2) {
+        stateChange("Florida");
+    } else if (infoPage == 3) {
+        stateChange("Illinois");
+    }
+}
+
+// Resize listener to handle redrawing the graph when the window size changes
 window.addEventListener("resize", function() {
     // Recompute window boundaries
     // SVGWidth = Math.max(640, document.getElementById("chart1").offsetWidth - (2 * Margin));
@@ -22,13 +99,29 @@ window.addEventListener("resize", function() {
 });
 
 /*
+ * Starts the interactive presentation by removing the overlay.
+ */
+function removeOverlay() {
+    document.getElementById("introOverlay").style.transition
+    d3.select("#introOverlay")
+        .transition()
+        .duration(750)
+        .style("opacity", 0)
+        .on("end", function(x) {
+            d3.select("#introOverlay").style("display", "none");
+        })
+        ;
+
+}
+
+/*
  * Filters the data by state.
  */
-function filterByState(data, state) {
+function filterByState(_data, state) {
     toReturn = [];
-    for (var i = 0; i < data.length; i++) {
-        if (data[i].Province_State === state) {
-            toReturn.push(data[i]);
+    for (var i = 0; i < _data.length; i++) {
+        if (_data[i].Province_State === state) {
+            toReturn.push(_data[i]);
         }
     }
     return toReturn;
@@ -38,11 +131,11 @@ function filterByState(data, state) {
  * Filters the data by date.
  * Use a date string in the format: "MM/DD/YYYY", with leading zeros removed.
  */
-function filterByDate(data, date) {
+function filterByDate(_data, date) {
     toReturn = [];
-    for (var i = 0; i < data.length; i++) {
-        if (data[i].Date === date) {
-            toReturn.push(data[i]);
+    for (var i = 0; i < _data.length; i++) {
+        if (_data[i].Date === date) {
+            toReturn.push(_data[i]);
         }
     }
     return toReturn;
@@ -51,10 +144,10 @@ function filterByDate(data, date) {
 /*
  * Filters the data by the columns needed for the visualization.
  */
-function usefulColumns(data) {
+function usefulColumns(_data) {
     toReturn = [];
-    for (var i = 0; i < data.length; i++) {
-        var elem = data[i];
+    for (var i = 0; i < _data.length; i++) {
+        var elem = _data[i];
         toReturn.push({
             Active: elem.Active,
             Confirmed: elem.Confirmed,
@@ -62,7 +155,10 @@ function usefulColumns(data) {
             Deaths: elem.Deaths,
             Hospitalization_Rate: elem.Hospitalization_Rate,
             Province_State: elem.Province_State,
-            Testing_Rate: elem.Testing_Rate
+            Testing_Rate: elem.Testing_Rate,
+            Delta_Active: elem.Delta_Active,
+            Delta_Confirmed: elem.Delta_Confirmed,
+            Delta_Deaths: elem.Delta_Deaths
         })
     }
     return toReturn;
@@ -85,10 +181,16 @@ function drawLineChart(svg, _data, color, attribute) {
         .attr("id", "line" + attribute)
         .attr("fill", "none")
         .attr("stroke", color)
-        .attr("stroke-width", 5)
+        .attr("stroke-width", 2.5)
+        .attr("pointer-events", "none")
         .attr("d", d3.line()
             .x(function(d,i) { return x(i); })
-            .y(function(d,i) { return SVGHeight - height(d[attribute]); })
+            .y(function(d,i) {
+                if (!d[attribute]) {
+                    return SVGHeight;
+                }
+                return SVGHeight - height(d[attribute]);
+            })
         )
         // .on("mouseover", function(d,i) {
         //     var coords = d3.mouse(this);
@@ -119,34 +221,16 @@ var deathsActive = true;
 
 function toggleActive() {
     activeActive = !activeActive;
-    if (activeActive) {
-        // $("#lineActive").show();
-        // console.log();
-        d3.select("#lineActive").style("opacity", 1);
-    } else {
-        // $("#lineActive").hide();
-        d3.select("#lineActive").style("opacity", 0);
-    }
     recomputeBounds();
 }
 
 function toggleConfirmed() {
     confirmedActive = !confirmedActive;
-    if (confirmedActive) {
-        $("#lineConfirmed").show();
-    } else {
-        $("#lineConfirmed").hide();
-    }
     recomputeBounds();
 }
 
 function toggleDeaths() {
     deathsActive = !deathsActive;
-    if (deathsActive) {
-        $("#lineDeaths").show();
-    } else {
-        $("#lineDeaths").hide();
-    }
     recomputeBounds();
 }
 
@@ -180,20 +264,34 @@ function recomputeBounds() {
 
     y = d3.scaleLinear()
         .domain([0, d3.max(filtered, function(d) {
+            var a = d.Active;
+            if (!a) { a = 0; }
+            var b = d.Confirmed;
+            if (!b) { b = 0; }
+            var c = d.Deaths;
+            if (!c) { c = 0; }
+
             return Math.max(
-                activeActive ? d.Active : 0,
-                confirmedActive ? d.Confirmed : 0,
-                deathsActive ? d.Deaths : 0
+                activeActive ? a : 0,
+                confirmedActive ? b : 0,
+                deathsActive ? c : 0
             )
         })])
         .range([SVGHeight, 0]);
 
     height = d3.scaleLinear()
         .domain([0, d3.max(filtered, function(d) {
+            var a = d.Active;
+            if (!a) { a = 0; }
+            var b = d.Confirmed;
+            if (!b) { b = 0; }
+            var c = d.Deaths;
+            if (!c) { c = 0; }
+
             return Math.max(
-                activeActive ? d.Active : 0,
-                confirmedActive ? d.Confirmed : 0,
-                deathsActive ? d.Deaths : 0
+                activeActive ? a : 0,
+                confirmedActive ? b : 0,
+                deathsActive ? c : 0
             )
         })])
         .range([0, SVGHeight]);
@@ -320,6 +418,7 @@ function redraw() {
                 </div>`;
 
             tooltip.html(tooltipString)
+                .style("background", "#0066AA11")
                 .style("left", (d3.event.pageX) + "px")
                 .style("top", (d3.event.pageY) + "px")
             ;
@@ -329,12 +428,13 @@ function redraw() {
     drawLineChart(svg, filtered, "steelblue", "Active");
     drawLineChart(svg, filtered, "darkgreen", "Confirmed");
     drawLineChart(svg, filtered, "red", "Deaths");
+    // drawLineChart(svg, filtered, "blue", "Delta_Confirmed");
     // drawLineChart(svg, filtered, "steelblue", "Testing_Rate");
 
     // Title
     d3.select("svg")
         .append("text")
-        .attr("transform", "translate(" + (SVGWidth / 2 + 35) + "," + (Margin + 35) + ")")
+        .attr("transform", "translate(" + (SVGWidth / 2 + 50) + "," + (Margin + 35) + ")")
         .attr("font-size", "2rem")
         .attr("font-weight", "bold")
         .attr("text-anchor", "middle")
@@ -377,9 +477,43 @@ d3.tsv("https://raw.githubusercontent.com/rushingseas8/CS498-Narrative-Visualiza
         // Store all the data in memory
         data = _data;
 
-        // for (var i = 0; i < data.length; i++) {
-        //     data.ID = i;
-        // }
+        for (var i = 0; i < data.length; i++) {
+            data[i].ID = i;
+        }
+
+        // console.log(data[0]);
+
+        var stateSet = new Set();
+        for (var i = 0; i < 100; i++) {
+            stateSet.add(data[i].Province_State);
+        }
+        // console.log(stateSet);
+
+        // Filter by each unique state
+        for (let state of stateSet) {
+            var filter = filterByState(data, state);
+
+            // console.log(filter);
+
+            // Compute the delta between each consecutive day for each state
+            data[filter[0].ID].Delta_Active = 0;
+            for (var i = 1; i < filter.length; i++) {
+                data[filter[i].ID].Delta_Active = Math.max(0, filter[i].Active - filter[i - 1].Active);
+            }
+
+            data[filter[0].ID].Delta_Confirmed = 0;
+            for (var i = 1; i < filter.length; i++) {
+                data[filter[i].ID].Delta_Confirmed = Math.max(0, filter[i].Confirmed - filter[i - 1].Confirmed);
+            }
+
+            data[filter[0].ID].Delta_Deaths = 0;
+            for (var i = 1; i < filter.length; i++) {
+                data[filter[i].ID].Delta_Deaths = Math.max(0, filter[i].Deaths - filter[i - 1].Deaths);
+            }
+
+        }
+
+        // console.log(data);
 
 
 

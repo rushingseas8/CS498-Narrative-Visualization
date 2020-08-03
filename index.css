@@ -2,3 +2,24 @@
     display: block;
     width: 100%;
 }
+
+.overlay {
+    z-index: 1;
+    height: 100%;
+    width: 100%;
+    position: fixed;
+    left: 0;
+    top: 0;
+    background: white;
+}
+
+.overlayTitle {
+    text-align: center;
+}
+
+#overlayJumbotron {
+    position: absolute;
+    top: 30%;
+    left: 5%;
+    transform: translate(-2.5%, -30%);
+}
